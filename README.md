@@ -1,5 +1,11 @@
 # 英语绘本跟读纠错系统（小学 3-6 年级 · 班级内使用）
 
+> **仓库**：https://github.com/Lucas201107/kids-reader
+>
+> ```bash
+> git clone https://github.com/Lucas201107/kids-reader.git
+> ```
+
 面向班级小范围使用的微信小程序：**英文绘本阅读 + 课文单词跟读 + 发音纠错 + 错词本 + 班级任务与报告**。
 
 学生读完一遍，系统逐词给出评分，把读错、漏读、发音偏低的词标出来并沉淀到个人错词本；老师可以布置任务、看到班级完成率和高频错词。
@@ -88,7 +94,7 @@ kids-reader/
 ### 本地开发（Windows / macOS）
 
 ```bash
-git clone <你的仓库地址> kids-reader && cd kids-reader/server
+git clone https://github.com/Lucas201107/kids-reader.git kids-reader && cd kids-reader/server
 
 npm install                       # 1. 装依赖
 cp .env.example .env              # 2. 配环境（默认值即可跑通）
@@ -102,7 +108,7 @@ npm run start:dev                 # 5. 启动
 ### 服务器首次部署（Linux）
 
 ```bash
-git clone <你的仓库地址> /opt/kids-reader && cd /opt/kids-reader
+git clone https://github.com/Lucas201107/kids-reader.git /opt/kids-reader && cd /opt/kids-reader
 
 cp deploy/.env.production.example server/.env
 vim server/.env                   # 填域名、微信 AppID、腾讯云密钥、后台密码
@@ -183,7 +189,7 @@ npm run start:dev        # 或 npm run build && npm run start:prod
 
 ```bash
 # 服务器上（代码放到 /opt/kids-reader）
-git clone <你的仓库地址> /opt/kids-reader && cd /opt/kids-reader
+git clone https://github.com/Lucas201107/kids-reader.git /opt/kids-reader && cd /opt/kids-reader
 cp deploy/.env.production.example server/.env && vim server/.env
 SEED=yes bash deploy/deploy.sh        # 首次部署
 bash deploy/backup.sh                 # 测一次备份，然后挂 crontab

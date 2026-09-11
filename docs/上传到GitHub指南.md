@@ -1,89 +1,77 @@
 # 上传到 GitHub 并部署到服务器 —— 操作指南
 
-> 仓库已经在本地准备好了：`kids-reader/` 目录下已初始化 git 仓库，分支 `main`，
-> 首次提交已完成（82 个文件，仓库体积约 440 KB，**不含** `node_modules`、`dist`、`.env`、`*.db`、`uploads`）。
+> **当前状态：仓库已创建并推送完成 ✅**
+>
+> - 仓库地址：**https://github.com/Lucas201107/kids-reader**（public）
+> - 分支：`main`，提交数 2，共 **83 个文件**，仓库体积约 500 KB
+> - 提交署名已绑定到 GitHub 账号（`Lucas201107 <295031867+Lucas201107@users.noreply.github.com>`）
+> - 本地已配置 `origin` 与上游跟踪，`git push` / `git pull` 可直接用
+> - 仓库**不含** `node_modules`、`dist`、`.env`、`*.db`、`uploads` 内容
+>
+> 也就是说，下面的「第 0～2 步」已经做完了，**你只需要看第 3 步（服务器部署）和第 4 步（日常更新）**。
+> 保留完整步骤是为了说明当时怎么做的，以及仓库重建时可复用。
 
 ---
 
-## 第 0 步：设置提交署名（只需一次）
+## 一、已经完成的步骤（存档备查）
 
-提交记录会公开展示作者名和邮箱，先改成你自己的：
+### 第 0 步：提交署名
+
+提交记录会公开展示作者名和邮箱。已设置为 GitHub 无痕邮箱，这样提交会自动挂到账号头像下：
 
 ```bash
-cd kids-reader
-git config user.name  "你的名字或GitHub用户名"
-git config user.email "你的GitHub注册邮箱"
-
-# 修正已经生成的那次提交的署名
+git config user.name  "Lucas201107"
+git config user.email "295031867+Lucas201107@users.noreply.github.com"
 git commit --amend --reset-author --no-edit
 ```
 
-验证：
+> 想改用真实邮箱的话，换成 GitHub 账号里已验证的邮箱即可（否则提交不会计入贡献图）。
+
+### 第 1 步：创建仓库
+
+通过 GitHub API 创建，参数等价于网页操作：
+
+- 仓库名 `kids-reader`，**public**（与已有的 `vocab3500` 保持一致）
+- 未勾选 "Add a README / .gitignore / license"（本地已有，勾选会导致首次推送冲突）
+- 默认分支 `main`
+
+### 第 2 步：关联远程并推送
 
 ```bash
-git log -1 --format="%an <%ae>"
+git remote add origin https://github.com/Lucas201107/kids-reader.git
+git push -u origin main          # 本次用 token 认证完成
 ```
 
-> 建议顺便设为全局默认，以后新建项目不用再配：
-> `git config --global user.name "..."` + `git config --global user.email "..."`
+推送后校验：远端 `main` 的 SHA 与本地 `HEAD` 完全一致
+（`3bfc8f1bac1bfd4ebeab691f852c753e6567e3aa`），远端 83 个文件齐全。
 
----
+**关于认证方式**（下次推送时参考）：
 
-## 第 1 步：在 GitHub 创建空仓库
+- 本机没装 `gh` CLI，也没有 SSH 密钥，走 **HTTPS** 最省事
+- 首次 `push` 会弹出 Git Credential Manager 窗口，选 **Sign in with your browser** 授权，
+  凭证会被记住，后续推送不用再输
+- 若弹出命令行要密码：GitHub 已不支持账号密码，需在
+  Settings → Developer settings → Personal access tokens 生成 token（勾选 `repo` 权限）当密码用
 
-1. 打开 https://github.com/new
-2. **Repository name**：`kids-reader`（或你喜欢的名字）
-3. **Visibility**：建议选 **Private**
-   - 仓库里包含老师邀请码、后台密码的**默认值**（虽然都是占位符），但系统用于校内班级，私有更稳妥
-4. **不要**勾选 "Add a README file"、".gitignore"、"Choose a license"
-   - 我们已经有了，勾选会导致推送时冲突
-5. 点 **Create repository**
-
-创建后页面会显示仓库地址，形如：
-
-```
-https://github.com/你的用户名/kids-reader.git
-```
-
----
-
-## 第 2 步：关联远程仓库并推送
-
-在 `kids-reader/` 目录下执行（把地址换成你自己的）：
-
-```bash
-git remote add origin https://github.com/你的用户名/kids-reader.git
-git push -u origin main
-```
-
-**关于认证**：本机没装 `gh` CLI，也没有 SSH 密钥，走 HTTPS 最简单。
-首次 `push` 会弹出 Git Credential Manager 窗口，选 **Sign in with your browser** 授权即可，
-凭证会被记住，后续推送不用再输。
-
-> 如果弹出的是命令行提示要密码：GitHub 已不支持账号密码，
-> 需要到 Settings → Developer settings → Personal access tokens 生成一个 token（勾选 `repo` 权限），
-> 在密码位置粘贴这个 token。
-
-推送成功后访问 `https://github.com/你的用户名/kids-reader` 应该能看到完整目录结构。
+> ⚠️ **token 安全**：GitHub 的 token 一旦泄露等同于账号写入权限。
+> 用完请到 Settings → Developer settings → Personal access tokens 立即 **Delete** 并重新生成；
+> 也**不要**把 token 写进 `.env`、脚本或任何会被提交的文件。
 
 ### 上传方式备选：网页拖拽
 
-不想用命令行的话，也可以在空仓库页面点 **uploading an existing file**，
-把 `kids-reader` 里的文件拖进去。但要注意：
-
-- 拖拽前**先删掉** `server/node_modules`、`server/dist`、`server/.env`、`server/prisma/dev.db`、`server/uploads` 里的内容
-- 网页上传不支持空目录，`uploads/*/.gitkeep` 这些占位文件建议保留内容（随便写一行字）
-- 后续更新只能重新拖拽，没法 `git pull`，所以**推荐还是用命令行**
+不想用命令行的话，也可以在仓库页面点 **Add file → Upload files** 拖入。
+但要注意拖拽前先删掉 `server/node_modules`、`server/dist`、`server/.env`、`server/prisma/dev.db`、
+`server/uploads` 里的内容，且后续更新只能重新拖拽、没法 `git pull`，所以**推荐用命令行**。
 
 ---
 
-## 第 3 步：服务器上拉取并部署
+## 二、服务器上拉取并部署（首次）
 
 登录服务器后：
 
 ```bash
 # 1. 拉代码（首次）
-git clone https://github.com/你的用户名/kids-reader.git /opt/kids-reader
+git clone https://github.com/Lucas201107/kids-reader.git /opt/kids-reader
 cd /opt/kids-reader
 
 # 2. 配置生产环境变量
@@ -107,12 +95,12 @@ crontab -e
 > ```bash
 > ssh-keygen -t ed25519 -C "server" -f ~/.ssh/id_ed25519 -N ""
 > cat ~/.ssh/id_ed25519.pub     # 复制到 GitHub 仓库 → Settings → Deploy keys → Add
-> git remote set-url origin git@github.com:你的用户名/kids-reader.git
+> git remote set-url origin git@github.com:Lucas201107/kids-reader.git
 > ```
 
 ---
 
-## 第 4 步：日常更新流程
+## 三、日常更新流程
 
 本地改完代码后：
 
@@ -136,7 +124,7 @@ bash deploy/deploy.sh          # 会自动先备份数据库，再编译重启
 
 ---
 
-## 第 5 步：如果改了数据库表结构
+## 四、改了数据库表结构怎么办
 
 修改 `server/prisma/schema.prisma` 后推送，服务器上 `deploy.sh` 里的 `prisma db push` 会自动同步。
 
@@ -153,7 +141,7 @@ bash deploy/backup.sh
 
 ---
 
-## 常见问题
+## 五、常见问题
 
 ### 1. 中文文件名显示成一串数字（`\344\275\277...`）
 
@@ -216,7 +204,7 @@ git ls-files | xargs ls -lh 2>/dev/null | sort -k5 -h | tail -10
 
 ---
 
-## 推送前自检清单
+## 六、推送前自检清单
 
 ```bash
 cd kids-reader
