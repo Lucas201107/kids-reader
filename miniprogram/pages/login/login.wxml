@@ -1,0 +1,33 @@
+<view class="page">
+  <view class="hero">
+    <view class="logo">ABC</view>
+    <view class="h1">英语绘本跟读</view>
+    <view class="sub">读一遍，马上知道哪个单词没读对</view>
+  </view>
+
+  <view class="card">
+    <view class="label">你的昵称</view>
+    <input class="input" placeholder="例如：小明" value="{{nickname}}" bindinput="onNickname" />
+
+    <view class="label">身份</view>
+    <view class="row">
+      <view class="pick {{role==='student'?'on':''}}" data-role="student" bindtap="pickRole">学生</view>
+      <view class="pick {{role==='teacher'?'on':''}}" data-role="teacher" bindtap="pickRole">老师</view>
+    </view>
+
+    <block wx:if="{{role==='student'}}">
+      <view class="label">年级</view>
+      <view class="row">
+        <view wx:for="{{grades}}" wx:key="*this" class="pick {{grade===item?'on':''}}" data-grade="{{item}}" bindtap="pickGrade">{{item}} 年级</view>
+      </view>
+    </block>
+
+    <block wx:if="{{role==='teacher'}}">
+      <view class="label">教师邀请码</view>
+      <input class="input" placeholder="向管理员获取" value="{{secret}}" bindinput="onSecret" password />
+    </block>
+
+    <view class="btn" style="margin-top:32rpx" bindtap="submit">进入学习</view>
+    <view class="tip">首次进入会自动创建账号，仅用于班级内部学习</view>
+  </view>
+</view>

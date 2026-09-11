@@ -1,0 +1,148 @@
+<view class="page">
+  <view class="tabs">
+    <view class="tab {{tab==='class'?'on':''}}" data-tab="class" bindtap="switchTab">班级</view>
+    <view class="tab {{tab==='assign'?'on':''}}" data-tab="assign" bindtap="switchTab">布置</view>
+    <view class="tab {{tab==='stat'?'on':''}}" data-tab="stat" bindtap="switchTab">数据</view>
+    <view class="tab {{tab==='content'?'on':''}}" data-tab="content" bindtap="switchTab">录入</view>
+  </view>
+
+  <!-- 班级 -->
+  <block wx:if="{{tab==='class'}}">
+    <view class="card">
+      <view class="title">创建新班级</view>
+      <input class="input" placeholder="班级名称，如：三年级二班" value="{{className}}" bindinput="onClassName" />
+      <view class="row" style="margin-top:16rpx">
+        <view class="g {{newGrade===item?'on':''}}" wx:for="{{[3,4,5,6]}}" wx:key="*this" data-g="{{item}}" bindtap="pickNewGrade">{{item}}年级</view>
+      </view>
+      <view class="btn" style="margin-top:24rpx" bindtap="createClass">创建</view>
+    </view>
+
+    <view class="card" wx:for="{{classes}}" wx:key="id">
+      <view class="between">
+        <view class="title" style="margin:0">{{item.name}}</view>
+        <view class="sub">{{item.studentCount}} 人</view>
+      </view>
+      <view class="between" style="margin-top:16rpx">
+        <view class="code">班级码 {{item.code}}</view>
+        <view class="mini-btn" bindtap="copyCode" data-code="{{item.code}}">复制</view>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!classes.length}}">还没有班级，先创建一个</view>
+  </block>
+
+  <!-- 布置任务 -->
+  <block wx:if="{{tab==='assign'}}">
+    <view class="card">
+      <view class="title">选择班级</view>
+      <view class="row" style="flex-wrap:wrap">
+        <view class="g {{assign.classId===item.id?'on':''}}" wx:for="{{classes}}" wx:key="id" data-id="{{item.id}}" bindtap="pickClass">{{item.name}}</view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="title">任务标题</view>
+      <input class="input" placeholder="如：Unit 3 单词跟读" value="{{assign.title}}" bindinput="onAssignTitle" />
+    </view>
+
+    <view class="card">
+      <view class="title">内容类型</view>
+      <view class="row">
+        <view class="g {{assign.type==='word'?'on':''}}" data-t="word" bindtap="pickType">单词</view>
+        <view class="g {{assign.type==='lesson'?'on':''}}" data-t="lesson" bindtap="pickType">课文</view>
+        <view class="g {{assign.type==='book'?'on':''}}" data-t="book" bindtap="pickType">绘本</view>
+      </view>
+      <view class="sub" style="margin-top:16rpx">点选要布置的内容（可多选）</view>
+      <view class="row" style="flex-wrap:wrap;margin-top:12rpx">
+        <view class="pick-item {{item.checked?'on':''}}" wx:for="{{candidates}}" wx:key="id" data-id="{{item.id}}" bindtap="toggleCandidate">
+          {{item.title}}
+        </view>
+      </view>
+    </view>
+
+    <view class="btn" bindtap="submitAssign">布置任务</view>
+  </block>
+
+  <!-- 数据 -->
+  <block wx:if="{{tab==='stat'}}">
+    <view class="card">
+      <view class="title">选择班级</view>
+      <view class="row" style="flex-wrap:wrap">
+        <view class="g {{statClassId===item.id?'on':''}}" wx:for="{{classes}}" wx:key="id" data-id="{{item.id}}" bindtap="pickStatClass">{{item.name}}</view>
+      </view>
+    </view>
+
+    <block wx:if="{{stat}}">
+      <view class="card">
+        <view class="row">
+          <view class="stat"><view class="num">{{stat.activeCount}}/{{stat.memberCount}}</view><view class="sub">活跃人数</view></view>
+          <view class="stat"><view class="num">{{stat.totalRecords}}</view><view class="sub">跟读次数</view></view>
+          <view class="stat"><view class="num">{{stat.avgScore}}</view><view class="sub">平均分</view></view>
+        </view>
+        <view class="btn ghost" style="margin-top:24rpx" bindtap="copyReport">复制班级报告</view>
+      </view>
+
+      <view class="card">
+        <view class="between">
+          <view class="title" style="margin:0">高频错词</view>
+          <view class="mini-btn" wx:if="{{stat.topWrongWords.length}}" bindtap="copyWrongWords">复制错词</view>
+        </view>
+        <view class="row" style="flex-wrap:wrap;margin-top:12rpx">
+          <view class="bad" wx:for="{{stat.topWrongWords}}" wx:key="word">{{item.word}} ×{{item.count}}</view>
+        </view>
+        <view class="empty" wx:if="{{!stat.topWrongWords.length}}">暂无数据</view>
+        <view class="sub" wx:if="{{stat.topWrongWords.length}}" style="margin-top:12rpx">复制后可直接粘贴到备课文档，课堂带读这几个词</view>
+      </view>
+
+      <view class="card">
+        <view class="title">学生排行</view>
+        <view class="rec" wx:for="{{stat.ranking}}" wx:key="id">
+          <view class="between">
+            <view>{{index+1}}. {{item.nickname}}</view>
+            <view class="sub">{{item.count}} 次 · 均分 {{item.avgScore}}</view>
+          </view>
+        </view>
+      </view>
+    </block>
+  </block>
+
+  <!-- 录入内容 -->
+  <block wx:if="{{tab==='content'}}">
+    <view class="card">
+      <view class="row">
+        <view class="g {{contentType==='word'?'on':''}}" data-c="word" bindtap="pickContentType">单词</view>
+        <view class="g {{contentType==='lesson'?'on':''}}" data-c="lesson" bindtap="pickContentType">课文</view>
+        <view class="g {{contentType==='book'?'on':''}}" data-c="book" bindtap="pickContentType">绘本</view>
+      </view>
+    </view>
+
+    <view class="card" wx:if="{{contentType==='word'}}">
+      <view class="title">批量添加单词（每行一个）</view>
+      <textarea class="input area" placeholder="cat 猫&#10;dog 狗&#10;apple 苹果" value="{{wordText}}" bindinput="onWordText" />
+      <view class="row" style="margin-top:16rpx">
+        <view class="g {{wordGrade===item?'on':''}}" wx:for="{{[3,4,5,6]}}" wx:key="*this" data-g="{{item}}" bindtap="pickWordGrade">{{item}}年级</view>
+      </view>
+      <input class="input" style="margin-top:16rpx" placeholder="单元，如 Unit 1" value="{{wordUnit}}" bindinput="onWordUnit" />
+      <view class="btn" style="margin-top:24rpx" bindtap="submitWords">保存单词</view>
+    </view>
+
+    <view class="card" wx:if="{{contentType==='lesson'}}">
+      <input class="input" placeholder="课文标题" value="{{lesson.title}}" bindinput="onLessonTitle" />
+      <textarea class="input area" style="margin-top:16rpx" placeholder="英文正文" value="{{lesson.content}}" bindinput="onLessonContent" />
+      <textarea class="input area" style="margin-top:16rpx" placeholder="中文翻译（可选）" value="{{lesson.translation}}" bindinput="onLessonTrans" />
+      <view class="row" style="margin-top:16rpx">
+        <view class="g {{lesson.grade===item?'on':''}}" wx:for="{{[3,4,5,6]}}" wx:key="*this" data-g="{{item}}" bindtap="pickLessonGrade">{{item}}年级</view>
+      </view>
+      <view class="btn" style="margin-top:24rpx" bindtap="submitLesson">保存课文</view>
+    </view>
+
+    <view class="card" wx:if="{{contentType==='book'}}">
+      <input class="input" placeholder="绘本标题" value="{{book.title}}" bindinput="onBookTitle" />
+      <textarea class="input area" style="margin-top:16rpx" placeholder="每页一行英文，空行分页" value="{{book.pagesText}}" bindinput="onBookPages" />
+      <view class="row" style="margin-top:16rpx">
+        <view class="g {{book.grade===item?'on':''}}" wx:for="{{[3,4,5,6]}}" wx:key="*this" data-g="{{item}}" bindtap="pickBookGrade">{{item}}年级</view>
+      </view>
+      <view class="btn" style="margin-top:24rpx" bindtap="submitBook">保存绘本</view>
+      <view class="sub" style="margin-top:16rpx">大批量内容建议用 Excel 导入（管理后台 /admin）</view>
+    </view>
+  </block>
+</view>

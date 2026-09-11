@@ -1,0 +1,88 @@
+.tabs {
+  display: flex;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 8rpx;
+  margin-bottom: 20rpx;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  border-radius: 16rpx;
+  color: #5f6b7f;
+  font-size: 26rpx;
+}
+.tab.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.input {
+  background: #f5f7fa;
+  border-radius: 12rpx;
+  padding: 18rpx 24rpx;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 28rpx;
+}
+.area {
+  height: 200rpx;
+  margin-top: 16rpx;
+}
+.g {
+  padding: 10rpx 26rpx;
+  border-radius: 999rpx;
+  background: #f1f3f8;
+  color: #5f6b7f;
+  margin: 0 14rpx 14rpx 0;
+  font-size: 26rpx;
+}
+.g.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.code {
+  font-size: 32rpx;
+  letter-spacing: 4rpx;
+  font-weight: 600;
+}
+.mini-btn {
+  background: #eaf1ff;
+  color: #4c8bf5;
+  padding: 10rpx 26rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+.pick-item {
+  padding: 12rpx 24rpx;
+  border-radius: 999rpx;
+  background: #f1f3f8;
+  color: #5f6b7f;
+  margin: 0 14rpx 14rpx 0;
+  font-size: 24rpx;
+}
+.pick-item.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.stat {
+  flex: 1;
+  text-align: center;
+}
+.num {
+  font-size: 38rpx;
+  font-weight: 600;
+  color: #4c8bf5;
+}
+.bad {
+  background: #fdeceb;
+  color: #c0392b;
+  padding: 10rpx 20rpx;
+  border-radius: 999rpx;
+  margin: 8rpx 12rpx 0 0;
+  font-size: 26rpx;
+}
+.rec {
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #f1f3f8;
+}

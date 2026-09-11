@@ -1,0 +1,21 @@
+<view class="page">
+  <view class="tabs">
+    <view class="tab {{tab==='book'?'on':''}}" data-tab="book" bindtap="switchTab">绘本</view>
+    <view class="tab {{tab==='lesson'?'on':''}}" data-tab="lesson" bindtap="switchTab">课文</view>
+  </view>
+
+  <view class="row grades">
+    <view class="g {{grade===item?'on':''}}" wx:for="{{grades}}" wx:key="*this" data-g="{{item}}" bindtap="pickGrade">{{item}}年级</view>
+  </view>
+
+  <view class="empty" wx:if="{{!list.length}}">暂无内容，可让老师在管理后台添加</view>
+
+  <view class="card item" wx:for="{{list}}" wx:key="id" bindtap="open" data-id="{{item.id}}">
+    <view class="between">
+      <view class="item-title">{{item.title}}</view>
+      <view class="tag" wx:if="{{tab==='book'}}">{{item._count.pages}} 页</view>
+      <view class="tag" wx:else>Unit {{item.unit}}</view>
+    </view>
+    <view class="sub">{{item.description || (tab==='lesson' ? item.content : '')}}</view>
+  </view>
+</view>

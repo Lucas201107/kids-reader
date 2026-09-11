@@ -1,0 +1,156 @@
+// Prisma Schema —— 小学英文绘本与课文跟读纠错系统
+// 默认使用 SQLite（零运维，适合班级小范围使用）。
+// 需要切换 MySQL 时：把 provider 改成 "mysql"，url 改成 "mysql://user:pass@localhost:3306/kids_reader"，
+// 并把下面所有 Json/数组相关的 String 字段保持原样即可（已全部用 String 存储，兼容两者）。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 用户：学生 / 老师 / 家长共用一张表，用 role 区分
+model User {
+  id        Int      @id @default(autoincrement())
+  openid    String   @unique
+  nickname  String   @default("")
+  avatar    String   @default("")
+  role      String   @default("student") // student | teacher
+  grade     Int? // 3-6 年级
+  classId   Int?
+  class     Class?   @relation("ClassStudents", fields: [classId], references: [id])
+  teachClasses Class[] @relation("ClassTeacher")
+  createdAt DateTime @default(now())
+
+  records    ReadingRecord[]
+  wrongWords WrongWord[]
+
+  @@index([classId])
+}
+
+// 班级
+model Class {
+  id        Int      @id @default(autoincrement())
+  name      String
+  code      String   @unique // 6 位班级码，学生用它加入
+  grade     Int?
+  teacherId Int
+  teacher   User     @relation("ClassTeacher", fields: [teacherId], references: [id])
+  students  User[]   @relation("ClassStudents")
+  createdAt DateTime @default(now())
+
+  assignments Assignment[]
+}
+
+// 绘本
+model Book {
+  id          Int      @id @default(autoincrement())
+  title       String
+  cover       String   @default("")
+  description String   @default("")
+  grade       Int // 适用年级范围用 gradeFrom/gradeTo 更灵活，这里简化为起始年级
+  gradeTo     Int?
+  source      String   @default("custom") // seed | custom | ocr | excel
+  createdById Int?
+  createdAt   DateTime @default(now())
+
+  pages BookPage[]
+}
+
+// 绘本单页
+model BookPage {
+  id        Int    @id @default(autoincrement())
+  bookId    Int
+  book      Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  pageNo    Int
+  image     String @default("")
+  text      String // 英文原文，跟读评测的参考答案
+  translation String @default("")
+  audio     String @default("") // 标准示范音频
+
+  @@index([bookId])
+}
+
+// 课文（教材单元课文 / 短文）
+model Lesson {
+  id          Int      @id @default(autoincrement())
+  title       String
+  grade       Int
+  unit        String   @default("")
+  content     String // 英文全文
+  translation String   @default("")
+  audio       String   @default("")
+  source      String   @default("custom")
+  createdAt   DateTime @default(now())
+}
+
+// 单词
+model Word {
+  id        Int    @id @default(autoincrement())
+  text      String
+  phonetic  String @default("") // 音标
+  meaning   String @default("") // 中文释义
+  grade     Int
+  unit      String   @default("")
+  audio     String   @default("")
+  source    String   @default("custom")
+
+  @@index([grade, unit])
+}
+
+// 老师布置的任务
+model Assignment {
+  id        Int      @id @default(autoincrement())
+  classId   Int
+  class     Class    @relation(fields: [classId], references: [id], onDelete: Cascade)
+  teacherId Int
+  title     String
+  type      String // word | lesson | book
+  refIds    String   @default("[]") // JSON 数组字符串，例如 "[1,2,3]"
+  dueDate   DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([classId])
+}
+
+// 跟读记录（一次录音一次记录）
+model ReadingRecord {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refType      String // word | lesson | bookPage
+  refId        Int
+  refTitle     String   @default("")
+  refText      String // 评测时使用的原文
+  audioUrl     String   @default("")
+  score        Float    @default(0) // 综合分
+  accuracy     Float    @default(0) // 发音准确度
+  fluency      Float    @default(0) // 流利度
+  completeness Float    @default(0) // 完整度
+  // 逐词结果 JSON：[{word, score, matchTag, phoneScore}] matchTag: 0 正常 1 漏读 2 多读 3 错读
+  detail       String   @default("[]")
+  // 判定需要纠正的词 JSON 字符串数组
+  wrongWords   String   @default("[]")
+  assignmentId Int?
+  createdAt    DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([refType, refId])
+}
+
+// 错词本（按用户 + 单词聚合）
+model WrongWord {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word      String
+  count     Int      @default(1)
+  lastScore Float    @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, word])
+  @@index([userId])
+}

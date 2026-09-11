@@ -1,0 +1,12 @@
+<view class="page">
+  <view class="empty" wx:if="{{!list.length}}">还没有任务</view>
+
+  <view class="card" wx:for="{{list}}" wx:key="id" bindtap="open" data-item="{{item}}">
+    <view class="between">
+      <view class="title" style="margin:0">{{item.title}}</view>
+      <view class="tag {{item.finished?'done':''}}">{{item.finished?'已完成':'待完成'}}</view>
+    </view>
+    <view class="sub">{{item.typeName}} · 共 {{item.refIds.length}} 项<block wx:if="{{item.finished}}"> · 平均分 {{item.myAvg}}</block></view>
+    <view class="sub" wx:if="{{item.dueDate}}">截止：{{item.dueDate}}</view>
+  </view>
+</view>

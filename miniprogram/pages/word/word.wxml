@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="row grades">
+    <view class="g {{grade===item?'on':''}}" wx:for="{{grades}}" wx:key="*this" data-g="{{item}}" bindtap="pickGrade">{{item}}年级</view>
+    <view class="g {{mode==='wrong'?'on':''}}" bindtap="toggleWrong">错词本</view>
+  </view>
+
+  <view class="empty" wx:if="{{!list.length}}">暂无单词</view>
+
+  <view class="card item" wx:for="{{list}}" wx:key="text" bindlongpress="removeWrong" data-wid="{{item.wid}}" data-text="{{item.text}}">
+    <view class="between">
+      <view>
+        <view class="word">{{item.text}}</view>
+        <view class="sub">{{item.phonetic}} {{item.meaning}}</view>
+      </view>
+      <view class="mic" bindtap="read" data-id="{{item.id}}" data-wid="{{item.wid}}" data-text="{{item.text}}">跟读</view>
+    </view>
+    <view class="sub" wx:if="{{item.count}}">错了 {{item.count}} 次 · 上次 {{item.lastScore}} 分（长按可移除）</view>
+  </view>
+</view>

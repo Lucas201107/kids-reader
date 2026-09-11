@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>英语绘本跟读 · 内容管理后台</title>
+<style>
+  :root { --blue:#4c8bf5; --bg:#f5f7fa; --line:#e6eaf2; --text:#22262f; --sub:#8a94a6; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif; background:var(--bg); color:var(--text); font-size:14px; }
+  header { background:#fff; padding:16px 24px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:9; }
+  header h1 { font-size:16px; margin:0; font-weight:600; }
+  .wrap { max-width:960px; margin:0 auto; padding:24px; }
+  .card { background:#fff; border-radius:12px; padding:20px; margin-bottom:16px; box-shadow:0 2px 8px rgba(76,139,245,.06); }
+  h2 { font-size:15px; margin:0 0 12px; font-weight:600; }
+  label { display:block; font-size:13px; color:#5f6b7f; margin:12px 0 6px; }
+  input, textarea, select { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; font-size:14px; font-family:inherit; outline:none; }
+  input:focus, textarea:focus { border-color:var(--blue); }
+  textarea { min-height:140px; resize:vertical; line-height:1.7; }
+  button { background:var(--blue); color:#fff; border:none; border-radius:8px; padding:10px 20px; font-size:14px; cursor:pointer; }
+  button.ghost { background:#fff; color:var(--blue); border:1px solid var(--blue); }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  .row { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+  .tabs { display:flex; gap:8px; margin-bottom:16px; }
+  .tab { padding:8px 18px; border-radius:999px; background:#fff; color:#5f6b7f; cursor:pointer; border:1px solid var(--line); }
+  .tab.on { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .hint { color:var(--sub); font-size:12px; margin-top:8px; line-height:1.7; }
+  .msg { padding:10px 14px; border-radius:8px; margin-top:12px; font-size:13px; display:none; }
+  .msg.ok { background:#e8f6ee; color:#1f9254; display:block; }
+  .msg.err { background:#fdeceb; color:#c0392b; display:block; }
+  table { width:100%; border-collapse:collapse; margin-top:12px; }
+  th, td { text-align:left; padding:8px; border-bottom:1px solid var(--line); font-size:13px; }
+  th { color:var(--sub); font-weight:500; }
+  .chip { display:inline-block; background:#eaf1ff; color:var(--blue); padding:2px 10px; border-radius:999px; font-size:12px; margin-right:6px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>英语绘本跟读 · 内容管理后台</h1>
+  <span id="who" style="color:#8a94a6;font-size:13px"></span>
+</header>
+
+<div class="wrap" id="loginBox">
+  <div class="card">
+    <h2>登录</h2>
+    <label>账号</label><input id="user" value="admin" />
+    <label>密码</label><input id="pass" type="password" placeholder="默认 admin123" />
+    <div style="margin-top:16px"><button onclick="login()">登录</button></div>
+    <div class="hint">默认账号密码在服务器 .env 中配置（ADMIN_USER / ADMIN_PASS），上线前务必修改。</div>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+</div>
+
+<div class="wrap" id="mainBox" style="display:none">
+  <div class="tabs">
+    <div class="tab on" data-t="word" onclick="switchTab('word')">单词</div>
+    <div class="tab" data-t="lesson" onclick="switchTab('lesson')">课文</div>
+    <div class="tab" data-t="book" onclick="switchTab('book')">绘本</div>
+    <div class="tab" data-t="ocr" onclick="switchTab('ocr')">图片识别</div>
+  </div>
+
+  <!-- 单词 -->
+  <div class="card" id="tab-word">
+    <h2>批量添加单词</h2>
+    <div class="row">
+      <select id="wGrade" style="width:120px">
+        <option value="3">3 年级</option><option value="4">4 年级</option>
+        <option value="5">5 年级</option><option value="6">6 年级</option>
+      </select>
+      <input id="wUnit" placeholder="单元，如 Unit 1" style="width:220px" />
+    </div>
+    <label>每行一个：单词 + 空格 + 中文释义（音标可选）</label>
+    <textarea id="wText" placeholder="cat 猫&#10;dog 狗&#10;apple 苹果"></textarea>
+    <div class="row" style="margin-top:12px">
+      <button onclick="submitWords()">保存单词</button>
+      <span class="hint" style="margin:0">大批量建议用下方 Excel 导入</span>
+    </div>
+
+    <h2 style="margin-top:28px">Excel / CSV 导入</h2>
+    <div class="row">
+      <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="width:auto" />
+      <select id="importType" style="width:150px">
+        <option value="word">单词表</option>
+        <option value="lesson">课文表</option>
+        <option value="book">绘本（每页一行）</option>
+      </select>
+      <button onclick="importExcel()">开始导入</button>
+      <a href="/templates/import-template.xlsx" style="color:#4c8bf5;font-size:13px">下载导入模板</a>
+    </div>
+    <div class="hint">
+      单词表头：word / 单词、phonetic / 音标、meaning / 释义、grade / 年级、unit / 单元<br />
+      课文表头：title / 课文、content / 正文、translation / 翻译、grade、unit<br />
+      绘本表头：book / 书名、page / 页码、text / 正文、translation / 翻译、image / 配图、grade
+    </div>
+    <div class="msg" id="wordMsg"></div>
+  </div>
+
+  <!-- 课文 -->
+  <div class="card" id="tab-lesson" style="display:none">
+    <h2>添加课文 / 短文</h2>
+    <div class="row">
+      <input id="lTitle" placeholder="标题，如 Unit 2 My family" style="flex:2;min-width:220px" />
+      <select id="lGrade" style="width:120px">
+        <option value="3">3 年级</option><option value="4">4 年级</option>
+        <option value="5">5 年级</option><option value="6">6 年级</option>
+      </select>
+      <input id="lUnit" placeholder="单元" style="width:140px" />
+    </div>
+    <label>英文正文</label>
+    <textarea id="lContent" placeholder="This is my family. My father is a teacher..."></textarea>
+    <label>中文翻译（可选）</label>
+    <textarea id="lTrans" style="min-height:100px"></textarea>
+    <div style="margin-top:12px"><button onclick="submitLesson()">保存课文</button></div>
+    <div class="msg" id="lessonMsg"></div>
+  </div>
+
+  <!-- 绘本 -->
+  <div class="card" id="tab-book" style="display:none">
+    <h2>添加绘本</h2>
+    <div class="row">
+      <input id="bTitle" placeholder="绘本标题" style="flex:2;min-width:220px" />
+      <select id="bGrade" style="width:120px">
+        <option value="3">3 年级</option><option value="4">4 年级</option>
+        <option value="5">5 年级</option><option value="6">6 年级</option>
+      </select>
+      <input id="bCover" placeholder="封面图片 URL（可选）" style="flex:1;min-width:180px" />
+    </div>
+    <label>分页内容：两个换行表示新的一页；每页第一行可写中文翻译（以“译：”开头）</label>
+    <textarea id="bPages" style="min-height:240px" placeholder="The tortoise and the hare.&#10;译：龟兔赛跑&#10;&#10;The hare runs fast.&#10;译：兔子跑得很快。"></textarea>
+    <div style="margin-top:12px"><button onclick="submitBook()">保存绘本</button></div>
+    <div class="msg" id="bookMsg"></div>
+  </div>
+
+  <!-- OCR -->
+  <div class="card" id="tab-ocr" style="display:none">
+    <h2>拍照 / 截图识别英文</h2>
+    <div class="row">
+      <input type="file" id="ocrFile" accept="image/*" style="width:auto" />
+      <button onclick="runOcr()">识别</button>
+    </div>
+    <label>识别结果（可直接编辑后粘贴到课文或绘本）</label>
+    <textarea id="ocrText" style="min-height:220px"></textarea>
+    <div class="hint">需要服务端配置腾讯云 OCR 密钥（TENCENT_SECRET_ID / TENCENT_SECRET_KEY）。</div>
+    <div class="msg" id="ocrMsg"></div>
+  </div>
+</div>
+
+<script>
+let token = localStorage.getItem('kr_admin_token') || '';
+
+function api(path, options = {}) {
+  const headers = options.headers || {};
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (!(options.body instanceof FormData)) headers['content-type'] = 'application/json';
+  return fetch(path, { ...options, headers }).then(async (r) => {
+    if (r.status === 401) { showLogin(); throw new Error('未登录'); }
+    const data = await r.json().catch(() => ({}));
+    if (r.status >= 400) throw new Error(data.message || '请求失败');
+    return data;
+  });
+}
+
+function msg(id, text, ok) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+}
+
+function login() {
+  const username = document.getElementById('user').value;
+  const password = document.getElementById('pass').value;
+  fetch('/api/auth/admin-login', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  })
+    .then((r) => r.json())
+    .then((data) => {
+      if (!data.token) throw new Error(data.message || '登录失败');
+      token = data.token;
+      localStorage.setItem('kr_admin_token', token);
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('mainBox').style.display = 'block';
+      document.getElementById('who').textContent = '管理员已登录';
+    })
+    .catch((e) => msg('loginMsg', e.message, false));
+}
+
+function showLogin() {
+  token = '';
+  localStorage.removeItem('kr_admin_token');
+  document.getElementById('loginBox').style.display = 'block';
+  document.getElementById('mainBox').style.display = 'none';
+}
+
+function switchTab(t) {
+  document.querySelectorAll('.tab').forEach((el) => el.classList.toggle('on', el.dataset.t === t));
+  ['word', 'lesson', 'book', 'ocr'].forEach((k) => {
+    document.getElementById('tab-' + k).style.display = k === t ? 'block' : 'none';
+  });
+}
+
+function submitWords() {
+  const text = document.getElementById('wText').value;
+  const grade = Number(document.getElementById('wGrade').value);
+  const unit = document.getElementById('wUnit').value;
+  const items = text.split('\n').map((l) => l.trim()).filter(Boolean).map((l) => {
+    const arr = l.split(/\s+/);
+    return { text: arr[0], phonetic: '', meaning: arr.slice(1).join(' '), grade, unit };
+  });
+  if (!items.length) return msg('wordMsg', '请输入单词', false);
+  api('/api/content/words', { method: 'POST', body: JSON.stringify({ items }) })
+    .then((r) => { msg('wordMsg', '已添加 ' + r.count + ' 个单词', true); document.getElementById('wText').value = ''; })
+    .catch((e) => msg('wordMsg', e.message, false));
+}
+
+function importExcel() {
+  const file = document.getElementById('excelFile').files[0];
+  if (!file) return msg('wordMsg', '请选择文件', false);
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('type', document.getElementById('importType').value);
+  api('/api/content/import', { method: 'POST', body: fd })
+    .then((r) => msg('wordMsg', '导入成功，共 ' + r.count + ' 条', true))
+    .catch((e) => msg('wordMsg', e.message, false));
+}
+
+function submitLesson() {
+  const body = {
+    title: document.getElementById('lTitle').value,
+    grade: Number(document.getElementById('lGrade').value),
+    unit: document.getElementById('lUnit').value,
+    content: document.getElementById('lContent').value,
+    translation: document.getElementById('lTrans').value,
+  };
+  if (!body.title || !body.content) return msg('lessonMsg', '标题和正文不能为空', false);
+  api('/api/content/lessons', { method: 'POST', body: JSON.stringify(body) })
+    .then(() => { msg('lessonMsg', '保存成功', true); document.getElementById('lTitle').value = ''; document.getElementById('lContent').value = ''; })
+    .catch((e) => msg('lessonMsg', e.message, false));
+}
+
+function submitBook() {
+  const raw = document.getElementById('bPages').value.split(/\n\s*\n/).map((s) => s.trim()).filter(Boolean);
+  const pages = raw.map((block) => {
+    const lines = block.split('\n');
+    let translation = '';
+    if (lines[0] && lines[0].startsWith('译：')) { translation = lines.shift().replace('译：', ''); }
+    return { text: lines.join(' ').trim(), translation };
+  });
+  const body = {
+    title: document.getElementById('bTitle').value,
+    grade: Number(document.getElementById('bGrade').value),
+    cover: document.getElementById('bCover').value,
+    pages,
+  };
+  if (!body.title || !pages.length) return msg('bookMsg', '标题和分页内容不能为空', false);
+  api('/api/content/books', { method: 'POST', body: JSON.stringify(body) })
+    .then(() => { msg('bookMsg', '保存成功，共 ' + pages.length + ' 页', true); document.getElementById('bPages').value = ''; })
+    .catch((e) => msg('bookMsg', e.message, false));
+}
+
+function runOcr() {
+  const file = document.getElementById('ocrFile').files[0];
+  if (!file) return msg('ocrMsg', '请选择图片', false);
+  const fd = new FormData();
+  fd.append('file', file);
+  api('/api/content/ocr', { method: 'POST', body: fd })
+    .then((r) => {
+      document.getElementById('ocrText').value = r.text || '';
+      msg('ocrMsg', r.lines && r.lines.length ? '识别成功，共 ' + r.lines.length + ' 行' : '识别完成', true);
+    })
+    .catch((e) => msg('ocrMsg', e.message, false));
+}
+
+if (token) {
+  document.getElementById('loginBox').style.display = 'none';
+  document.getElementById('mainBox').style.display = 'block';
+  document.getElementById('who').textContent = '管理员已登录';
+}
+</script>
+</body>
+</html>

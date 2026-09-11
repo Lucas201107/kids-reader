@@ -1,0 +1,27 @@
+.grades {
+  margin-bottom: 20rpx;
+  flex-wrap: wrap;
+}
+.g {
+  padding: 10rpx 26rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #5f6b7f;
+  margin: 0 14rpx 14rpx 0;
+  font-size: 26rpx;
+}
+.g.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.word {
+  font-size: 36rpx;
+  font-weight: 600;
+}
+.mic {
+  background: #eaf1ff;
+  color: #4c8bf5;
+  padding: 14rpx 32rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+}

@@ -1,0 +1,61 @@
+# ============ 依赖 ============
+node_modules/
+.pnpm-store/
+
+# ============ 构建产物 ============
+dist/
+build/
+*.tsbuildinfo
+
+# ============ 环境变量与密钥（务必不要提交）============
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+
+# ============ 数据库 ============
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ============ 运行时上传目录（音频/图片，属用户数据，不入库）============
+# 目录结构由 .gitkeep 占位保留（应用启动时也会自动创建）
+server/uploads/*
+!server/uploads/.gitkeep
+!server/uploads/audio/
+!server/uploads/image/
+!server/uploads/templates/
+!server/uploads/file/
+server/uploads/audio/*
+server/uploads/image/*
+server/uploads/templates/*
+server/uploads/file/*
+!server/uploads/audio/.gitkeep
+!server/uploads/image/.gitkeep
+!server/uploads/templates/.gitkeep
+!server/uploads/file/.gitkeep
+
+# ============ 备份 ============
+.backup*/
+*.db.gz
+
+# ============ 日志 ============
+logs/
+*.log
+npm-debug.log*
+yarn-error.log*
+pm2-*.log
+
+# ============ 编辑器 / 系统 ============
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============ 微信开发者工具 ============
+miniprogram/project.private.config.json
+project.private.config.json

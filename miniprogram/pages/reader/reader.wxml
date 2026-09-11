@@ -1,0 +1,66 @@
+<view class="page">
+  <view class="card">
+    <view class="between">
+      <view class="title" style="margin:0">{{title || '跟读练习'}}</view>
+      <view class="sub" wx:if="{{indexText}}">{{indexText}}</view>
+    </view>
+
+    <image wx:if="{{image}}" class="pic" src="{{image}}" mode="widthFix" />
+
+    <view class="text-box">
+      <block wx:if="{{words.length}}">
+        <text wx:for="{{words}}" wx:key="index" class="w {{item.cls}}" data-w="{{item.word}}" bindtap="tapWord">{{item.word}} </text>
+      </block>
+      <block wx:else>
+        <text class="plain">{{text}}</text>
+      </block>
+    </view>
+
+    <view class="trans" wx:if="{{translation}}">{{translation}}</view>
+
+    <view class="row ops">
+      <view class="mini-btn" wx:if="{{audio}}" bindtap="playDemo">▶ 听范读</view>
+      <view class="mini-btn" wx:if="{{result && result.audioUrl}}" bindtap="playMine">▶ 听我的</view>
+    </view>
+  </view>
+
+  <block wx:if="{{!result}}">
+    <view class="mic-wrap">
+      <view class="mic {{recording?'on':''}}" bindtap="toggleRecord">
+        <view class="mic-text">{{recording ? '点击结束' : '按住跟读'}}</view>
+        <view class="mic-sub">{{recording ? tipRecording : '读完整句效果更好'}}</view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:if="{{result}}">
+    <view class="card score-card">
+      <view class="score">{{result.score}}</view>
+      <view class="sub">综合得分</view>
+      <view class="row dims">
+        <view class="dim"><view class="d-num">{{result.accuracy}}</view><view class="sub">发音</view></view>
+        <view class="dim"><view class="d-num">{{result.fluency}}</view><view class="sub">流利</view></view>
+        <view class="dim"><view class="d-num">{{result.completeness}}</view><view class="sub">完整</view></view>
+      </view>
+      <view class="tip-line" wx:if="{{result.mocked}}">当前为开发模式模拟评分，配置腾讯云密钥后为真实发音评测</view>
+    </view>
+
+    <view class="card" wx:if="{{result.wrongWords.length}}">
+      <view class="title">需要纠正的词</view>
+      <view class="row" style="flex-wrap:wrap">
+        <view class="bad" wx:for="{{result.wrongWords}}" wx:key="*this">{{item}}</view>
+      </view>
+      <view class="sub" style="margin-top:16rpx">小贴士：点上方带下划线的词，再对照范读多练几遍</view>
+    </view>
+    <view class="card" wx:else>
+      <view class="title">全部读对啦 🎉</view>
+      <view class="sub">继续保持，每天读 5 分钟效果最好</view>
+    </view>
+
+    <view class="row btns">
+      <view class="btn ghost" style="flex:1;margin-right:16rpx" bindtap="again">再练一次</view>
+      <view class="btn" style="flex:1" wx:if="{{hasNext}}" bindtap="next">下一个</view>
+      <view class="btn" style="flex:1" wx:else bindtap="finish">完成</view>
+    </view>
+  </block>
+</view>

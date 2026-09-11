@@ -1,0 +1,71 @@
+<view class="page">
+  <view class="card head">
+    <view class="between">
+      <view>
+        <view class="hello">你好，{{user.nickname || '同学'}}</view>
+        <view class="sub">{{user.role==='teacher' ? '老师' : (user.grade ? user.grade+' 年级' : '未设置年级')}} · {{className || '尚未加入班级'}}</view>
+      </view>
+      <view class="avatar">{{user.nickname ? user.nickname[0] : 'A'}}</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{!classId}}">
+    <view class="title">加入班级</view>
+    <view class="sub">输入老师给的 6 位班级码</view>
+    <view class="row" style="margin-top:20rpx">
+      <input class="input" placeholder="班级码" value="{{code}}" bindinput="onCode" maxlength="6" />
+      <view class="join" bindtap="joinClass">加入</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{tasks.length}}">
+    <view class="between">
+      <view class="title" style="margin:0">待完成任务</view>
+      <view class="sub" bindtap="goTask">全部 ›</view>
+    </view>
+    <view class="task" wx:for="{{tasks}}" wx:key="id" bindtap="openTask" data-item="{{item}}">
+      <view class="row">
+        <view class="dot {{item.finished?'done':''}}"></view>
+        <view class="task-title">{{item.title}}</view>
+      </view>
+      <view class="sub">{{item.typeName}} · {{item.finished ? '已完成，平均分 '+item.myAvg : '未完成'}}</view>
+    </view>
+  </view>
+
+  <view class="quick">
+    <view class="q" bindtap="go" data-url="/pages/book/book?tab=book">
+      <view class="q-icon" style="background:#eaf1ff">绘</view>
+      <view>绘本跟读</view>
+    </view>
+    <view class="q" bindtap="go" data-url="/pages/book/book?tab=lesson">
+      <view class="q-icon" style="background:#e8f6ee">课</view>
+      <view>课文跟读</view>
+    </view>
+    <view class="q" bindtap="go" data-url="/pages/word/word">
+      <view class="q-icon" style="background:#fdf3e2">词</view>
+      <view>单词练习</view>
+    </view>
+    <view class="q" bindtap="go" data-url="/pages/mine/mine?tab=wrong">
+      <view class="q-icon" style="background:#fdeceb">错</view>
+      <view>错词本</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{stats}}">
+    <view class="between">
+      <view class="title" style="margin:0">我的学习</view>
+      <view class="sub" bindtap="go" data-url="/pages/mine/mine">详情 ›</view>
+    </view>
+    <view class="row" style="margin-top:20rpx">
+      <view class="stat"><view class="num">{{stats.total}}</view><view class="sub">跟读次数</view></view>
+      <view class="stat"><view class="num">{{stats.avgScore}}</view><view class="sub">平均分</view></view>
+      <view class="stat"><view class="num">{{stats.wrongWords.length}}</view><view class="sub">错词数</view></view>
+    </view>
+    <view class="bars">
+      <view class="bar-col" wx:for="{{stats.practiceDays}}" wx:key="date">
+        <view class="bar" style="height:{{item.count*18+4}}rpx"></view>
+        <view class="bar-label">{{item.date}}</view>
+      </view>
+    </view>
+  </view>
+</view>

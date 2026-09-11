@@ -1,0 +1,99 @@
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: #4c8bf5;
+  color: #fff;
+  text-align: center;
+  line-height: 96rpx;
+  font-size: 38rpx;
+}
+.input {
+  flex: 1;
+  background: #f5f7fa;
+  border-radius: 12rpx;
+  padding: 18rpx 24rpx;
+}
+.join {
+  margin-left: 16rpx;
+  background: #4c8bf5;
+  color: #fff;
+  padding: 18rpx 32rpx;
+  border-radius: 12rpx;
+}
+.tabs {
+  display: flex;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 8rpx;
+  margin-bottom: 20rpx;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 16rpx;
+  color: #5f6b7f;
+}
+.tab.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.stat {
+  flex: 1;
+  text-align: center;
+}
+.num {
+  font-size: 40rpx;
+  font-weight: 600;
+  color: #4c8bf5;
+}
+.bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200rpx;
+  margin-top: 30rpx;
+}
+.bar-col {
+  flex: 1;
+  text-align: center;
+}
+.bar {
+  width: 40rpx;
+  margin: 0 auto;
+  background: #9dc0ff;
+  border-radius: 8rpx 8rpx 0 0;
+  min-height: 6rpx;
+}
+.bar-label {
+  font-size: 20rpx;
+  color: #a8b0bf;
+  margin-top: 8rpx;
+}
+.rec {
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #f1f3f8;
+}
+.rec-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-right: 16rpx;
+}
+.rec-score {
+  color: #4c8bf5;
+  font-weight: 600;
+}
+.word {
+  font-size: 34rpx;
+  font-weight: 600;
+}
+.mic {
+  background: #eaf1ff;
+  color: #4c8bf5;
+  padding: 14rpx 32rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+}

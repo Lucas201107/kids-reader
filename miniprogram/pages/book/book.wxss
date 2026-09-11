@@ -1,0 +1,44 @@
+.tabs {
+  display: flex;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 8rpx;
+  margin-bottom: 20rpx;
+}
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 18rpx 0;
+  border-radius: 16rpx;
+  color: #5f6b7f;
+}
+.tab.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.grades {
+  margin-bottom: 20rpx;
+}
+.g {
+  padding: 10rpx 26rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #5f6b7f;
+  margin-right: 14rpx;
+  font-size: 26rpx;
+}
+.g.on {
+  background: #4c8bf5;
+  color: #fff;
+}
+.item-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.item .sub {
+  margin-top: 8rpx;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

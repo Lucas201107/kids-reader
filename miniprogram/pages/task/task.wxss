@@ -1,0 +1,4 @@
+.tag.done {
+  background: #e8f6ee;
+  color: #1f9254;
+}

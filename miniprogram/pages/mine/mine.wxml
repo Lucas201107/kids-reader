@@ -1,0 +1,80 @@
+<view class="page">
+  <view class="card">
+    <view class="between">
+      <view>
+        <view class="title" style="margin:0">{{user.nickname}}</view>
+        <view class="sub">{{user.role==='teacher'?'老师':(user.grade?user.grade+' 年级':'未设置年级')}} · {{user.className || '未加入班级'}}</view>
+      </view>
+      <view class="avatar">{{user.nickname ? user.nickname[0] : 'A'}}</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{!user.classId}}">
+    <view class="title">加入班级</view>
+    <view class="row" style="margin-top:16rpx">
+      <input class="input" placeholder="6 位班级码" value="{{code}}" bindinput="onCode" maxlength="6" />
+      <view class="join" bindtap="joinClass">加入</view>
+    </view>
+  </view>
+
+  <view class="card" wx:else>
+    <view class="between">
+      <view class="title" style="margin:0">{{user.className}}</view>
+      <view class="sub" bindtap="leaveClass">退出班级</view>
+    </view>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{tab==='stat'?'on':''}}" data-tab="stat" bindtap="switchTab">学习统计</view>
+    <view class="tab {{tab==='wrong'?'on':''}}" data-tab="wrong" bindtap="switchTab">错词本</view>
+  </view>
+
+  <block wx:if="{{tab==='stat' && stats}}">
+    <view class="card">
+      <view class="row">
+        <view class="stat"><view class="num">{{stats.total}}</view><view class="sub">跟读次数</view></view>
+        <view class="stat"><view class="num">{{stats.avgScore}}</view><view class="sub">平均分</view></view>
+        <view class="stat"><view class="num">{{stats.wrongWords.length}}</view><view class="sub">错词数</view></view>
+      </view>
+      <view class="bars">
+        <view class="bar-col" wx:for="{{stats.practiceDays}}" wx:key="date">
+          <view class="bar" style="height:{{item.count*20+4}}rpx"></view>
+          <view class="bar-label">{{item.date}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="title">最近跟读</view>
+      <view class="rec" wx:for="{{stats.recent}}" wx:key="id">
+        <view class="between">
+          <view class="rec-title">{{item.refTitle || item.refText}}</view>
+          <view class="rec-score">{{item.score}}</view>
+        </view>
+      </view>
+      <view class="empty" wx:if="{{!stats.recent.length}}">还没有跟读记录</view>
+    </view>
+  </block>
+
+  <block wx:if="{{tab==='wrong'}}">
+    <view class="card" wx:for="{{wrongWords}}" wx:key="id" bindlongpress="removeWrong" data-id="{{item.id}}" data-word="{{item.word}}">
+      <view class="between">
+        <view>
+          <view class="word">{{item.word}}</view>
+          <view class="sub">错误 {{item.count}} 次 · 上次 {{item.lastScore}} 分</view>
+        </view>
+        <view class="mic" bindtap="read" data-word="{{item.word}}">练一练</view>
+      </view>
+    </view>
+    <view class="empty" wx:if="{{!wrongWords.length}}">暂无错词，很棒！</view>
+    <view class="sub" wx:else style="text-align:center;padding:16rpx">长按单词可移出错词本</view>
+  </block>
+
+  <view class="card" wx:if="{{user.role==='teacher'}}">
+    <view class="btn" bindtap="goTeacher">进入老师端</view>
+  </view>
+
+  <view class="card">
+    <view class="btn gray" bindtap="logout">退出登录</view>
+  </view>
+</view>
