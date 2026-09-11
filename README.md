@@ -73,6 +73,7 @@ kids-reader/
 │   ├── .env.production.example # 生产环境变量模板
 │   └── Dockerfile / docker-compose.yml
 ├── docs/
+│   ├── 上传到GitHub指南.md
 │   ├── 部署与上线清单.md
 │   ├── 接口文档.md
 │   └── 使用说明.md
@@ -92,7 +93,7 @@ git clone <你的仓库地址> kids-reader && cd kids-reader/server
 npm install                       # 1. 装依赖
 cp .env.example .env              # 2. 配环境（默认值即可跑通）
 npx prisma db push                # 3. 建表
-npm run seed                      # 4. 导入种子内容（124 词 / 3 课文 / 3 绘本）
+npm run seed                      # 4. 导入种子内容（122 词 / 3 课文 / 3 绘本，可重复执行）
 npm run start:dev                 # 5. 启动
 ```
 
